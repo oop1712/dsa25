@@ -49,7 +49,7 @@ int flight::create()
 
         for (j = 0; j < 10; j++)
         {
-            if (strcmp(city_index[j], d) == 0);
+            if (strcmp(city_index[j], d) == 0)
                break; 
         }
 
