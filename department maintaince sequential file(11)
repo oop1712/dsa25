@@ -1,34 +1,26 @@
-#include<iostream>
-#include<fstream>
-#include<cstring>
+#include <iostream>
+#include <fstream>
+#include <cstring>
 using namespace std;
 
 class tel {
 public:
-    int rollNo, roll1;
-    char name[10];
+    int rollNo;
+    char name[20];
     char div;
-    char address[20];
+    char address[50];
 
     void accept() {
         cout << "\n\tEnter Roll Number : ";
         cin >> rollNo;
         cout << "\n\tEnter the Name : ";
-        cin >> name;
-        cout << "\n\tEnter the Division:";
+        cin >> ws;
+        cin.getline(name, 20);
+        cout << "\n\tEnter the Division: ";
         cin >> div;
-        cout << "\n\tEnter the Address:";
-        cin >> address;
-    }
-
-    void accept2() {
-        cout << "\n\tEnter the Roll No. to modify : ";
-        cin >> rollNo;
-    }
-
-    void accept3() {
-        cout << "\n\tEnter the name to modify : ";
-        cin >> name;
+        cout << "\n\tEnter the Address: ";
+        cin >> ws;
+        cin.getline(address, 50);
     }
 
     int getRollNo() {
@@ -41,114 +33,130 @@ public:
 };
 
 int main() {
-    int i, n, ch, ch1, rec, start, count, add, n1, add2, start2, n2, y, a, b, on, oname, add3, start3, n3, y1, add4, start4, n4;
-    char name[20], name2[20];
+    int ch, ch1, rec;
+    char name[20];
     tel t1;
-    count = 0;
-    fstream g, f;
+    fstream f, g;
 
     do {
         cout << "\n>>>>>>>>>>>>>>>>>>>>>>MENU<<<<<<<<<<<<<<<<<<<<";
-        cout << "\n1.Insert and overwrite\n2.Show\n3.Search & Edit(number)\n4.Search & Edit(name)\n 5.Delete a Student Record\n 6.Exit\n\tEnter the Choice\t:";
+        cout << "\n1. Insert and overwrite\n2. Show\n3. Search & Edit (by number)\n4. Search & Edit (by name)\n5. Delete a Student Record\n6. Exit\n\tEnter your choice: ";
         cin >> ch;
+
         switch (ch) {
             case 1:
-                f.open("StuRecord.txt", ios::out);
-            x:
-                t1.accept();
-                f.write((char*)&t1, sizeof(t1));
-                cout << "\nDo you want to enter more records?\n1.Yes\n2.No";
-                cin >> ch1;
-                if (ch1 == 1)
-                    goto x;
-                else {
-                    f.close();
-                    break;
-                }
+                f.open("StuRecord.txt", ios::out | ios::binary);
+                do {
+                    t1.accept();
+                    f.write((char*)&t1, sizeof(t1));
+                    cout << "\nDo you want to enter more records?\n1. Yes\n2. No: ";
+                    cin >> ch1;
+                } while (ch1 == 1);
+                f.close();
+                break;
 
             case 2:
-                f.open("StuRecord.txt", ios::in);
-                f.read((char*)&t1, sizeof(t1));
-                while (f) {
+                f.open("StuRecord.txt", ios::in | ios::binary);
+                if (!f) {
+                    cout << "File not found.\n";
+                    break;
+                }
+                while (f.read((char*)&t1, sizeof(t1))) {
                     t1.show();
-                    f.read((char*)&t1, sizeof(t1));
                 }
                 f.close();
                 break;
 
             case 3:
-                cout << "\nEnter the roll number you want to find";
+                cout << "\nEnter the roll number you want to find: ";
                 cin >> rec;
-                f.open("StuRecord.txt", ios::in | ios::out);
-                f.read((char*)&t1, sizeof(t1));
-                while (f) {
-                    if (rec == t1.rollNo) {
-                        cout << "\nRecord found";
-                        add = f.tellg();
-                        f.seekg(0, ios::beg);
-                        start = f.tellg();
-                        n1 = (add - start) / sizeof(t1);
-                        f.seekp((n1 - 1) * sizeof(t1), ios::beg);
-                        t1.accept();
-                        f.write((char*)&t1, sizeof(t1));
-                        f.close();
-                        count++;
-                        break;
-                    }
-                    f.read((char*)&t1, sizeof(t1));
+                f.open("StuRecord.txt", ios::in | ios::out | ios::binary);
+                if (!f) {
+                    cout << "File not found.\n";
+                    break;
                 }
-                if (count == 0)
-                    cout << "\nRecord not found";
+                {
+                    bool found = false;
+                    streampos pos;
+                    while (f.read((char*)&t1, sizeof(t1))) {
+                        if (t1.getRollNo() == rec) {
+                            found = true;
+                            pos = f.tellg();
+                            f.seekp(pos - streamoff(sizeof(t1)));
+                            cout << "\nRecord found. Enter new details:\n";
+                            t1.accept();
+                            f.write((char*)&t1, sizeof(t1));
+                            break;
+                        }
+                    }
+                    if (!found)
+                        cout << "\nRecord not found.";
+                }
                 f.close();
                 break;
 
             case 4:
-                cout << "\nEnter the name you want to find and edit";
-                cin >> name;
-                f.open("StuRecord.txt", ios::in | ios::out);
-                f.read((char*)&t1, sizeof(t1));
-                while (f) {
-                    y = strcmp(name, t1.name);
-                    if (y == 0) {
-                        cout << "\nName found";
-                        add2 = f.tellg();
-                        f.seekg(0, ios::beg);
-                        start2 = f.tellg();
-                        n2 = (add2 - start2) / sizeof(t1);
-                        f.seekp((n2 - 1) * sizeof(t1), ios::beg);
-                        t1.accept();
-                        f.write((char*)&t1, sizeof(t1));
-                        f.close();
-                        break;
-                    }
-                    f.read((char*)&t1, sizeof(t1));
+                cout << "\nEnter the name you want to find and edit: ";
+                cin >> ws;
+                cin.getline(name, 20);
+                f.open("StuRecord.txt", ios::in | ios::out | ios::binary);
+                if (!f) {
+                    cout << "File not found.\n";
+                    break;
                 }
+                {
+                    bool found = false;
+                    streampos pos;
+                    while (f.read((char*)&t1, sizeof(t1))) {
+                        if (strcmp(name, t1.name) == 0) {
+                            found = true;
+                            pos = f.tellg();
+                            f.seekp(pos - streamoff(sizeof(t1)));
+                            cout << "\nName found. Enter new details:\n";
+                            t1.accept();
+                            f.write((char*)&t1, sizeof(t1));
+                            break;
+                        }
+                    }
+                    if (!found)
+                        cout << "\nName not found.";
+                }
+                f.close();
                 break;
 
             case 5: {
                 int roll;
-                cout << "Please Enter the Roll No. of Student Whose Info You Want to Delete: ";
+                cout << "Enter the Roll No. of the student to delete: ";
                 cin >> roll;
-                f.open("StuRecord.txt", ios::in);
-                g.open("temp.txt", ios::out);
-                f.read((char*)&t1, sizeof(t1));
-                while (!f.eof()) {
-                    if (t1.getRollNo() != roll)
+                f.open("StuRecord.txt", ios::in | ios::binary);
+                g.open("temp.txt", ios::out | ios::binary);
+                bool deleted = false;
+                while (f.read((char*)&t1, sizeof(t1))) {
+                    if (t1.getRollNo() != roll) {
                         g.write((char*)&t1, sizeof(t1));
-                    f.read((char*)&t1, sizeof(t1));
+                    } else {
+                        deleted = true;
+                    }
                 }
-                cout << "The record with the roll no. " << roll << " has been deleted " << endl;
                 f.close();
                 g.close();
                 remove("StuRecord.txt");
                 rename("temp.txt", "StuRecord.txt");
+                if (deleted)
+                    cout << "Record with roll no. " << roll << " deleted.";
+                else
+                    cout << "Record not found.";
                 break;
             }
 
             case 6:
-                cout << "\n\tThank you";
+                cout << "\n\tThank you!";
                 break;
+
+            default:
+                cout << "\nInvalid choice.";
         }
+
     } while (ch != 6);
 
     return 0;
