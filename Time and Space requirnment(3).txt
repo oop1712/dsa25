@@ -1,5 +1,5 @@
 #include <iostream>
-#include <cstring> // Include for strcmp
+#include <cstring>
 using namespace std;
 
 struct node {
@@ -77,15 +77,15 @@ void Gll::inserts() {
                 cout << "\nHow many sections do you want to enter: ";
                 int n;
                 cin >> n;
-                node *t1 = temp->down;
                 for (int i = 0; i < n; i++) {
                     node *t2 = create();
                     if (temp->down == NULL) {
                         temp->down = t2;
                     } else {
-                        while (t1->next != NULL)
-                            t1 = t1->next;
-                        t1->next = t2;
+                        node *sec = temp->down;
+                        while (sec->next != NULL)
+                            sec = sec->next;
+                        sec->next = t2;
                     }
                 }
                 return;
@@ -115,15 +115,15 @@ void Gll::insertss() {
                         cout << "\nHow many subsections do you want to enter: ";
                         int n;
                         cin >> n;
-                        node *t2 = t1->down;
                         for (int i = 0; i < n; i++) {
                             node *t3 = create();
                             if (t1->down == NULL) {
                                 t1->down = t3;
                             } else {
-                                while (t2->next != NULL)
-                                    t2 = t2->next;
-                                t2->next = t3;
+                                node *sub = t1->down;
+                                while (sub->next != NULL)
+                                    sub = sub->next;
+                                sub->next = t3;
                             }
                         }
                         return;
@@ -143,25 +143,21 @@ void Gll::displayb() {
     if (head == NULL) {
         cout << "\nBook not found.";
     } else {
-        node *temp = head;
-        cout << "\nNAME OF BOOK: " << temp->name;
-        while (temp != NULL) {
-            cout << "\n\tNAME OF CHAPTER: " << temp->name;
-            if (temp->down != NULL) {
-                node *t1 = temp->down;
-                while (t1 != NULL) {
-                    cout << "\n\t\tNAME OF SECTION: " << t1->name;
-                    if (t1->down != NULL) {
-                        node *t2 = t1->down;
-                        while (t2 != NULL) {
-                            cout << "\n\t\t\tNAME OF SUBSECTION: " << t2->name;
-                            t2 = t2->next;
-                        }
-                    }
-                    t1 = t1->next;
+        cout << "\nNAME OF BOOK: " << head->name;
+        node *chapter = head->down;
+        while (chapter != NULL) {
+            cout << "\n\tNAME OF CHAPTER: " << chapter->name;
+            node *section = chapter->down;
+            while (section != NULL) {
+                cout << "\n\t\tNAME OF SECTION: " << section->name;
+                node *subsection = section->down;
+                while (subsection != NULL) {
+                    cout << "\n\t\t\tNAME OF SUBSECTION: " << subsection->name;
+                    subsection = subsection->next;
                 }
+                section = section->next;
             }
-            temp = temp->next;
+            chapter = chapter->next;
         }
     }
 }
@@ -179,25 +175,13 @@ int main() {
         cout << "6. Exit\n";
         cin >> x;
         switch (x) {
-            case 1:
-                g.insertb();
-                break;
-            case 2:
-                g.insertc();
-                break;
-            case 3:
-                g.inserts();
-                break;
-            case 4:
-                g.insertss();
-                break;
-            case 5:
-                g.displayb();
-                break;
-            case 6:
-                exit(0);
-            default:
-                cout << "\nInvalid choice. Please enter again.";
+            case 1: g.insertb(); break;
+            case 2: g.insertc(); break;
+            case 3: g.inserts(); break;
+            case 4: g.insertss(); break;
+            case 5: g.displayb(); break;
+            case 6: exit(0);
+            default: cout << "\nInvalid choice. Please enter again.";
         }
     }
     return 0;
